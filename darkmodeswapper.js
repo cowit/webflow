@@ -41,7 +41,7 @@ function colorModeToggle() {
     if(index == 0) lightTheme = item
     else if (index == 1) darkTheme = item
   })
-
+  console.log("Test")
   let lightColors = {};
   let darkColors = {};
   cssVariables.split(",").forEach(function (item) {
