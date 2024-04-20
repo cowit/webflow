@@ -29,33 +29,40 @@ function colorModeToggle() {
     return;
   }
 
-  const themeVariables = scriptTag.getAttribute("color-theme-vars");
-  if (!themeVariables.length) {
-    console.warn(`Value of color-theme-vars attribute not found. Setting to default of "color" and "dark".`);
+  var primaryTheme = scriptTag.getAttribute("primary-theme");
+  if (!primaryTheme) {
+    console.warn(`Value of primary-theme not found. Setting to "color"`);
+    primaryTheme = "color"
     return;
   }
 
-  var lightTheme = "color"
-  var darkTheme = "dark"
-  themeVariables.split(",").forEach((item,index) => {
-    if(index == 0) lightTheme = item
-    else if (index == 1) darkTheme = item
-  })
-  console.log("Test")
-  let lightColors = {};
-  let darkColors = {};
+  var secondaryTheme = scriptTag.getAttribute("secondary-theme");
+  if (!secondaryTheme) {
+    console.log(`Value of secondary-theme not found. Setting to "secondary"`);
+    secondaryTheme = "secondary"
+    return;
+  }
+
+  var primaryLightMode = scriptTag.getAttribute("is-primary-light");
+  if (!primaryLightMode) {
+    console.warn(`Value of is-primary-light not found. Setting to "true" (Variable should be set to "true" if light theme is primary or "false" if dark theme is primary)`);
+    primaryLightMode = "true"
+    return;
+  }
+  let primaryColors = {};
+  let secondaryColors = {};
   cssVariables.split(",").forEach(function (item) {
-    console.log(`--${darkTheme}--${item}`)
-    let lightValue = computed.getPropertyValue(`--${lightTheme}--${item}`);
-    let darkValue = computed.getPropertyValue(`--${darkTheme}--${item}`);
-    if (lightValue.length) {
-      if (!darkValue.length) darkValue = lightValue;
-      lightColors[`--${lightTheme}--${item}`] = lightValue;
-      darkColors[`--${lightTheme}--${item}`] = darkValue;
+    let primaryValue = computed.getPropertyValue(`--${primaryTheme}--${item}`);
+    let secondaryValue = computed.getPropertyValue(`--${secondaryTheme}--${item}`);
+    if (primaryValue.length) {
+      if (!secondaryValue.length) secondaryValue = primaryValue;
+      
+      primaryColors[`--${primaryTheme}--${item}`] = primaryValue;
+      secondaryColors[`--${primaryTheme}--${item}`] = secondaryValue;
     }
   });
 
-  if (!Object.keys(lightColors).length) {
+  if (!Object.keys(primaryColors).length) {
     console.warn("No variables found matching tr-color-vars attribute value");
     return;
   }
@@ -74,16 +81,16 @@ function colorModeToggle() {
     }
   }
 
-  function goDark(dark, animate) {
-    if (dark) {
-      localStorage.setItem("dark-mode", "true");
-      htmlElement.classList.add("dark-mode");
-      setColors(darkColors, animate);
+  function goSecondary(secondary, animate) {
+    if (secondary) {
+      localStorage.setItem("secondary-mode", "true");
+      htmlElement.classList.add("secondary-mode");
+      setColors(secondaryColors, animate);
       togglePressed = "true";
     } else {
-      localStorage.setItem("dark-mode", "false");
-      htmlElement.classList.remove("dark-mode");
-      setColors(lightColors, animate);
+      localStorage.setItem("secondary-mode", "false");
+      htmlElement.classList.remove("secondary-mode");
+      setColors(primaryColors, animate);
       togglePressed = "false";
     }
     if (typeof toggleEl !== "undefined") {
@@ -94,31 +101,41 @@ function colorModeToggle() {
   }
 
   function checkPreference(e) {
-    goDark(e.matches, false);
+    goSecondary(e.matches, false);
   }
-  const colorPreference = window.matchMedia("(prefers-color-scheme: dark)");
-  colorPreference.addEventListener("change", (e) => {
-    checkPreference(e);
-  });
+  var colorPreference
+  if(primaryLightMode === "true") {
+    colorPreference = window.matchMedia("(prefers-color-scheme: dark)");
+    colorPreference.addEventListener("change", (e) => {
+      checkPreference(e);
+    });
+  }
+  else {
+    colorPreference = window.matchMedia("(prefers-color-scheme: light)");
+    colorPreference.addEventListener("change", (e) => {
+      checkPreference(e);
+    });
+  }
 
-  let storagePreference = localStorage.getItem("dark-mode");
+  let storagePreference = localStorage.getItem("secondary-mode");
   if (storagePreference !== null) {
-    storagePreference === "true" ? goDark(true, false) : goDark(false, false);
+    storagePreference === "true" ? goSecondary(true, false) : goSecondary(false, false);
   } else {
+    console.log(`Color Preference: ${colorPreference}`)
     checkPreference(colorPreference);
   }
 
   window.addEventListener("DOMContentLoaded", (event) => {
     toggleEl = document.querySelectorAll("[tr-color-toggle]");
     toggleEl.forEach(function (element) {
-      element.setAttribute("aria-label", "View Dark Mode");
+      element.setAttribute("aria-label", "View secondary Mode");
       element.setAttribute("role", "button");
       element.setAttribute("aria-pressed", togglePressed);
     });
     toggleEl.forEach(function (element) {
       element.addEventListener("click", function () {
-        let darkClass = htmlElement.classList.contains("dark-mode");
-        darkClass ? goDark(false, true) : goDark(true, true);
+        let secondaryClass = htmlElement.classList.contains("secondary-mode");
+        secondaryClass ? goSecondary(false, true) : goSecondary(true, true);
       });
     });
   });
