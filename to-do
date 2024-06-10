@@ -1,0 +1,36 @@
+Add users to make and secure connections between CMS, form pages, collections, dj pages
+Have DJ page read from collections
+Have a form page to fill collections, only accessible by moderators and the dj user
+Integrate google calender using zapier to fill in schedule details on their collection page
+
+
+
+Upcoming live DJ shows.
+    Integrate google calender
+    Allow DJs to fill in which days they will have shows on their form page
+
+Show live DJs that are currently on from the team.
+    Make box for showing live DJs
+    Automatically fill live from current calender.
+    Have a way for DJs to manually change it.
+    When it's styled, set up the show more.
+
+Me:
+Light and dark mode switch button
+    Use moon and sun from font awesome
+
+Google calender fill in the collections
+
+Set up live events
+    Go through list of all events
+    Sort them by date
+    Put them in
+    Currently live events go in another section
+
+Associate DJ collections with the user page
+
+Ask about Only allow DJ changes after admin approval
+
+Fill out DJ collections form
+
+Finish users set up
